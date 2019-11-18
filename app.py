@@ -1,5 +1,6 @@
 import os
 import subprocess
+import datetime
 from flask import Flask, abort, request, jsonify, g, url_for, redirect, escape, render_template, flash, session, make_response
 from wtforms import Form, BooleanField, StringField, PasswordField, validators, IntegerField, widgets, FileField
 from flask_wtf.csrf import CSRFProtect
@@ -11,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 #from db_setup import init_db
 #import models
 import db_init
-from tables import User_Table
+from tables import User_Table, Login_Table
  
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -82,7 +83,13 @@ def login():
                     response = make_response(render_template('login.html', form=form, result = result))
                     secure_response(response)
                     #session['login'] = True
+                    login_timestamp = datetime.datetime.now()
                     session['username'] = username
+                    current_session = s.sign(hashlib.sha256((username + login_timestamp.strftime("%m/%d/%Y, %H:%M:%S") + salt).encode()).hexdigest())
+                    session['ID'] = current_session
+                    login_history = db_init.Login_History(username = username, session_cookie = current_session, login_timestamp = login_timestamp, logout_timestamp = 'N/A')
+                    db_init.db_session.add(login_history)
+                    db_init.db_session.commit()
                     return response  
                 else:
                     print ("Login failed - two-factor")
@@ -253,6 +260,14 @@ def get_users():
     table = User_Table(results)
     table.border = True
     return render_template('get_users.html', table=table)
+    
+@app.route('/login_history', methods=['GET', 'POST'])
+def login_history():
+    if session['username'] == 'admin':
+        query = db_init.db_session.query(db_init.Login_History)
+        results = query.all()
+        table = Login_Table(results)
+        return render_template('login_history.html', table = table)
     
 def create_admin_account():
     admin_password_hash =hashlib.sha256((admin_credential['password'] + salt).encode()).hexdigest()
