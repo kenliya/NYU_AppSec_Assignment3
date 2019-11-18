@@ -81,6 +81,8 @@ def login():
                     result = "success"
                     response = make_response(render_template('login.html', form=form, result = result))
                     secure_response(response)
+                    #session['login'] = True
+                    session['username'] = username
                     return response  
                 else:
                     print ("Login failed - two-factor")
