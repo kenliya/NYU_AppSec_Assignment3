@@ -231,6 +231,11 @@ def spell_check():
         #proc = subprocess.run(["./a.out", "test.txt", "wordlist.txt"], capture_output = True, universal_newlines = True)
         proc = subprocess.run(["./a.out", "test.txt", "wordlist.txt"], stdout=PIPE, stderr=PIPE, universal_newlines = True)
         misspelled = proc.stdout
+        query_count = db_init.db_session.query(db_init.Query_History).count()
+        query = db_init.Query_History(username=session['username'], query_num = query_count, query_text = inputtext, query_results = misspelled)
+        query_count+=1
+        db_init.db_session.add(query)
+        db_init.db_session.commit()
         response = make_response(render_template('spell_check.html', form=form, misspelled=misspelled, textout=inputtext))
         secure_response(response)
         return response
@@ -286,6 +291,20 @@ def login_history():
             else:
                 return render_template('login_history.html', form = form)
     return redirect(url_for('login'))
+    
+@app.route('/history', methods=['GET', 'POST'])
+def history():
+    if 'username' in session.keys():
+        if session['username'] == 'admin':
+            query = db_init.db_session.query(db_init.Query_History)
+            query_count = query.count()
+            print ("query count:", query_count)
+            results = query.all()
+            print ("results:", results)
+            return render_template('history.html', results = results, query_count = query_count)
+    else:
+        return redirect(url_for('login'))
+    
     
 def create_admin_account():
     admin_password_hash =hashlib.sha256((admin_credential['password'] + salt).encode()).hexdigest()

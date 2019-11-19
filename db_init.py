@@ -29,6 +29,16 @@ class Login_History(Base):
     def __repr__(self):
         return '<Login_History {}>'.format(self.session_cookie)
         
+class Query_History(Base):
+    __tablename__ = 'table_history'
+    username = Column(String(32))
+    query_num = Column(Integer, unique=True, primary_key=True)
+    query_text = Column(String(1000))
+    query_results = Column(String(1000))
+    
+    def __repr__(self):
+        return '<Query_History {}>'.format(self.query_num)
+    
 # create tables
 #def db_init():
 Base.metadata.create_all(engine)
