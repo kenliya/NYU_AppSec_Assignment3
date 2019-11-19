@@ -227,7 +227,8 @@ def spell_check():
         inputtext = form.inputtext.data   
         with open("test.txt","w+") as fo:
             fo.write("%s" % inputtext)
-        proc = subprocess.run(["./a.out", "test.txt", "wordlist.txt"], capture_output = True, universal_newlines = True)
+        #proc = subprocess.run(["./a.out", "test.txt", "wordlist.txt"], capture_output = True, universal_newlines = True)
+        proc = subprocess.run(["./a.out", "test.txt", "wordlist.txt"], stdout=PIPE, stderr=PIPE, universal_newlines = True)
         misspelled = proc.stdout
         response = make_response(render_template('spell_check.html', form=form, misspelled=misspelled, textout=inputtext))
         secure_response(response)
