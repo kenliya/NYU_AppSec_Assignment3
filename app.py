@@ -302,6 +302,13 @@ def history():
             results = query.all()
             print ("results:", results)
             return render_template('history.html', results = results, query_count = query_count)
+        else:
+            query = db_init.Query_History.query.filter(db_init.Query_History.username == session['username'])
+            query_count = query.count()
+            print ("query count:", query_count)
+            results = query.all()
+            print ("results:", results)
+            return render_template('history.html', results = results, query_count = query_count)
     else:
         return redirect(url_for('login'))
     
