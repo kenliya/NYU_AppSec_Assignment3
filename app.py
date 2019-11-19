@@ -199,6 +199,12 @@ def register():
  
 @app.route('/logout')
 def logout():
+    logout_timestamp = datetime.datetime.now()
+    login_history = db_init.Login_History.query.filter(db_init.Login_History.session_cookie == session['ID']).first()
+    login_history.logout_timestamp = logout_timestamp
+    db_init.db_session.commit()
+    #login_history = 
+    #login_history = db_init.Login_History(username = username, session_cookie = current_session, login_timestamp = login_timestamp, logout_timestamp = 'N/A')
     # remove the username from the session if it's there
     session.pop('username', None)
     session.pop('ID', None)
@@ -263,11 +269,13 @@ def get_users():
     
 @app.route('/login_history', methods=['GET', 'POST'])
 def login_history():
-    if session['username'] == 'admin':
-        query = db_init.db_session.query(db_init.Login_History)
-        results = query.all()
-        table = Login_Table(results)
-        return render_template('login_history.html', table = table)
+    if 'username' in session.keys():
+        if session['username'] == 'admin':
+            query = db_init.db_session.query(db_init.Login_History)
+            results = query.all()
+            table = Login_Table(results)
+            return render_template('login_history.html', table = table)
+    return redirect(url_for('login'))
     
 def create_admin_account():
     admin_password_hash =hashlib.sha256((admin_credential['password'] + salt).encode()).hexdigest()

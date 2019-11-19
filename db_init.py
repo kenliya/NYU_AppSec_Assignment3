@@ -21,13 +21,13 @@ class User(Base):
 
 class Login_History(Base):
     __tablename__ = 'login_history'
-    username = Column(String(32), unique=True, primary_key=True)
-    session_cookie = Column(String(1000), unique=True)
+    username = Column(String(32))
+    session_cookie = Column(String(1000), unique=True, primary_key=True)
     login_timestamp = Column(String(1000))
     logout_timestamp = Column(String(1000))
     
     def __repr__(self):
-        return '<Login_History {}>'.format(self.username)
+        return '<Login_History {}>'.format(self.session_cookie)
         
 # create tables
 #def db_init():
