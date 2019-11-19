@@ -48,6 +48,9 @@ class LoginForm(FlaskForm):
 class UploadForm(FlaskForm):
     inputtext = StringField('Text', [validators.DataRequired()], id='inputtext')
     
+class LoginHistoryForm(FlaskForm):
+    userid = StringField('Username', [validators.Length(min=4, max=25)], id='userid')
+    
 def reformat_phone(form, field):
     field.data = field.data.replace('-', '')
     return True
@@ -271,10 +274,15 @@ def get_users():
 def login_history():
     if 'username' in session.keys():
         if session['username'] == 'admin':
-            query = db_init.db_session.query(db_init.Login_History)
-            results = query.all()
-            table = Login_Table(results)
-            return render_template('login_history.html', table = table)
+            form = LoginHistoryForm(request.form)
+            if request.method == 'POST' and form.validate():
+                username = form.userid.data
+                query = db_init.Login_History.query.filter(db_init.Login_History.username == username)
+                results = query.all()
+                #table = Login_Table(results)
+                return render_template('login_history.html', form = form, results = results)
+            else:
+                return render_template('login_history.html', form = form)
     return redirect(url_for('login'))
     
 def create_admin_account():
