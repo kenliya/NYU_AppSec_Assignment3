@@ -260,12 +260,12 @@ def spell_check():
 #    db.session.commit()
 #    return jsonify({ 'username': user.username }), 201, {'Location': url_for('get_user', id = user.id, _external = True)}
 
-@app.errorhandler(404)
-def not_found(e):
-    response = make_response(redirect(url_for('register')))
-    response.headers['Content-Security-Policy'] = CSP
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    return response
+#@app.errorhandler(404)
+#def not_found(e):
+#    response = make_response(redirect(url_for('register')))
+#    response.headers['Content-Security-Policy'] = CSP
+#    response.headers['X-XSS-Protection'] = '1; mode=block'
+#    return response
     
 @app.route('/get_users', methods=['GET', 'POST'])
 def get_users():
