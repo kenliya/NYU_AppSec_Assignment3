@@ -311,7 +311,21 @@ def history():
             return render_template('history.html', results = results, query_count = query_count)
     else:
         return redirect(url_for('login'))
-    
+
+@app.route('/history/query<int:query_num>', methods=['GET'])
+def query_history(query_num):
+    print ("requesting query number:", query_num)
+    #query = db_init.Query_History.query.filter(db_init.Query_History.username == session['username'], db_init.Query_History.query_num == query_num)
+    query = db_init.Query_History.query.filter(db_init.Query_History.query_num == query_num)
+    #first = query.first()
+    #print (first.username, first.query_num)
+    results = query.all()
+    if results[0].username == session['username']:
+        for row in results:
+            print (row.username, row.query_num, row.query_text, row.query_results)
+    else:
+        results = None
+    return render_template('query_history.html', results = results)
     
 def create_admin_account():
     admin_password_hash =hashlib.sha256((admin_credential['password'] + salt).encode()).hexdigest()
