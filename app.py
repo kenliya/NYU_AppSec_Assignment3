@@ -279,9 +279,9 @@ def get_users():
     
 @app.route('/login_history', methods=['GET', 'POST'])
 def login_history():
+    form = LoginHistoryForm(request.form)
     if 'username' in session.keys():
         if session['username'] == 'admin':
-            form = LoginHistoryForm(request.form)
             if request.method == 'POST' and form.validate():
                 username = form.userid.data
                 query = db_init.Login_History.query.filter(db_init.Login_History.username == username)
@@ -290,7 +290,7 @@ def login_history():
                 return render_template('login_history.html', form = form, results = results)
             else:
                 return render_template('login_history.html', form = form)
-    return redirect(url_for('login'))
+    return render_template('login_history.html', form = form)
     
 @app.route('/history', methods=['GET', 'POST'])
 def history():
@@ -310,7 +310,7 @@ def history():
             print ("results:", results)
             return render_template('history.html', results = results, query_count = query_count)
     else:
-        return redirect(url_for('login'))
+        return render_template('history.html')
 
 @app.route('/history/query<int:query_num>', methods=['GET'])
 def query_history(query_num):
